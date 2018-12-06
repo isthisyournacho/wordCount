@@ -33,6 +33,7 @@ for o, a in myopts:
     elif o == '-w':
         wordchosen = a
 
+
 #If script is run with no arguments, display help
 if myopts == []:
     print("")
@@ -65,7 +66,9 @@ for filename in glob.glob(directory + searchpattern):
         pattern = re.compile("\w+\t.*")
         if pattern.match(sentence):
             intentKey = re.sub(r'(\w+)\t.*', r'\1', sentence)
-            print(intentKey)
+        else:
+            intentKey = "NEGATIVE"
+            #print(intentKey)
         #print("Sentence " + str(d) + " is: " + sentence)
         for word in sentence.lower().split():
             table = str.maketrans(dict.fromkeys(string.punctuation))
@@ -77,6 +80,14 @@ for filename in glob.glob(directory + searchpattern):
             if word in data:
                 #print(word + " already exists")
                 data[word]["occurrences"] = data[word]["occurrences"] + 1
+                if intentKey in data[word]:
+                    #Key already exists, increment
+                    data[word][intentKey] = data[word][intentKey] + 1
+                else:
+                    #Add Key = 1
+                    data[word][intentKey] = 1
+
+
                 #if sentence not in data[word]["examplelist"]:
                     #data[word]["examplelist"].append(sentence)
                 #if filename not in data[word]["doclist"]:
@@ -85,10 +96,10 @@ for filename in glob.glob(directory + searchpattern):
                 # Add word = word, occurrences = int (1), doc = doclist (filename), example = exampleList (sentence)
                 if data:
                     # If data exists but word is new, add a new entry
-                    data[word] = {"occurrences": 1, "doclist": [filename], "examplelist": [sentence]}
+                    data[word] = {"occurrences": 1, intentKey: 1}
                 else:
-                    # If data does not exist, create it
-                    data = {word: {"occurrences": 1, "doclist": [filename], "examplelist": [sentence]}}
+                    # If data does not exist, create it and add first word
+                    data = {word: {"occurrences": 1, intentKey: 1}}
                 if words:
                     words = words + "," + word
                 else:
